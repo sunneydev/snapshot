@@ -650,7 +650,7 @@ func (m model) viewInput(title, label string) string {
 	if m.workspace != "" {
 		sub = shortenHome(m.workspace)
 	}
-	return page(title, sub, "  "+label+"\n  "+accentStyle.Render("> ")+m.input.View(), "enter continue · esc back")
+	return page(title, sub, "  "+label+"\n  "+m.input.View(), "enter continue · esc back")
 }
 
 func (m model) toMenu() (tea.Model, tea.Cmd) {
