@@ -1,0 +1,20 @@
+{
+  "name": "snapshot-backup",
+  "version": "0.0.0",
+  "description": "workspace backup tool powered by restic with a beautiful tui",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sunneydev/snapshot"
+  },
+  "bin": {
+    "snapshot": "bin/snapshot"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "files": [
+    "install.js",
+    "bin/"
+  ]
+}

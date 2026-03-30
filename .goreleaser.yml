@@ -1,0 +1,45 @@
+version: 2
+
+builds:
+  - binary: snapshot
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - format: tar.gz
+    name_template: "snapshot_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: darwin
+        format: zip
+      - goos: windows
+        format: zip
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+brews:
+  - repository:
+      owner: sunneydev
+      name: homebrew-tap
+    name: snapshot
+    homepage: https://github.com/sunneydev/snapshot
+    description: workspace backup tool powered by restic with a beautiful tui
+    license: MIT
+    install: |
+      bin.install "snapshot"
