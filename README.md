@@ -2,6 +2,22 @@
 
 workspace backup tool powered by restic with a beautiful tui.
 
+## install
+
+```sh
+npm i -g snapshot-backup
+```
+
+```sh
+brew install sunneydev/tap/snapshot
+```
+
+```sh
+go install github.com/sunneydev/snapshot@latest
+```
+
+or download a binary from [releases](https://github.com/sunneydev/snapshot/releases).
+
 ## demo
 
 ```
@@ -15,22 +31,6 @@ workspace backup tool powered by restic with a beautiful tui.
     workspaces      manage workspaces
 
   ↑/↓ navigate · enter select · q quit
-```
-
-## install
-
-```sh
-# npm (easiest, cross-platform)
-npm i -g snapshot-backup
-
-# homebrew (macos)
-brew install sunneydev/tap/snapshot
-
-# go
-go install github.com/sunneydev/snapshot@latest
-
-# or download a binary from releases
-# https://github.com/sunneydev/snapshot/releases
 ```
 
 ## quick start
