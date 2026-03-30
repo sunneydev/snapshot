@@ -1,6 +1,6 @@
 # snapshot
 
-workspace backup tool powered by restic with a beautiful tui.
+automatic workspace backups with a beautiful tui.
 
 ## install
 
@@ -56,9 +56,9 @@ snapshot                # open the tui
 
 ## how it works
 
-snapshot uses [restic](https://restic.net) under the hood. each workspace gets its own restic repository with automatic deduplication. large files (>20M), build artifacts, node_modules, .git, and other common junk are excluded by default.
+each workspace gets its own backup repository with automatic deduplication and encryption. large files (>20M), build artifacts, node_modules, .git, and other common junk are excluded by default.
 
-backups are fast because restic only stores what changed since the last snapshot.
+backups are incremental - only changes since the last snapshot are stored, so they're fast and space-efficient.
 
 ## configuration
 
@@ -67,51 +67,27 @@ all config lives in `~/.config/snapshot/` (or `$XDG_CONFIG_HOME/snapshot/`).
 | file | purpose |
 |------|---------|
 | `workspaces` | registered workspace paths, one per line |
-| `password` | restic repository password |
+| `password` | repository encryption password |
 
 data (repos) is stored in `~/.local/share/snapshot/repos/` (or `$XDG_DATA_HOME/snapshot/repos/`).
 
 ### default excludes
 
-node_modules, .git, dist, build, .next, .turbo, .gradle, .venv, __pycache__, .cache, coverage, and more. files larger than 20M are skipped. see `restic.go` for the full list.
+node_modules, .git, dist, build, .next, .turbo, .gradle, .venv, __pycache__, .cache, coverage, and more. files larger than 20M are skipped.
 
 ## automatic backups
 
-### macos (launchd)
-
-save this as `~/Library/LaunchAgents/dev.sunney.snapshot.plist`:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>dev.sunney.snapshot</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/usr/local/bin/snapshot</string>
-        <string>save</string>
-    </array>
-    <key>StartInterval</key>
-    <integer>1800</integer>
-    <key>StandardOutPath</key>
-    <string>/tmp/snapshot.log</string>
-    <key>StandardErrorPath</key>
-    <string>/tmp/snapshot.log</string>
-</dict>
-</plist>
-```
+snapshot can set up automatic backups for you (launchd on macOS, cron on linux).
 
 ```sh
-launchctl load ~/Library/LaunchAgents/dev.sunney.snapshot.plist
+snapshot auto on 30m
 ```
 
-### linux (cron)
+you'll also be asked during `snapshot add` if you want to enable this. options: `10m`, `30m`, `1h`, `6h`.
 
 ```sh
-# every 30 minutes
-*/30 * * * * /usr/local/bin/snapshot save >> /tmp/snapshot.log 2>&1
+snapshot auto          # check status
+snapshot auto off      # disable
 ```
 
 ## claude code integration
@@ -120,7 +96,7 @@ snapshot works as a `/snapshot` skill in [claude code](https://claude.ai/claude-
 
 ## requirements
 
-- [restic](https://restic.net) (`brew install restic` / `apt install restic`)
+- [restic](https://restic.net) - installed automatically with homebrew, or `apt install restic` on linux
 
 ## license
 

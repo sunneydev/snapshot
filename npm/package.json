@@ -1,7 +1,7 @@
 {
   "name": "snapshot-backup",
   "version": "0.0.0",
-  "description": "workspace backup tool powered by restic with a beautiful tui",
+  "description": "automatic workspace backups with a beautiful tui",
   "license": "MIT",
   "repository": {
     "type": "git",

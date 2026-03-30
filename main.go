@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -23,7 +24,7 @@ func main() {
 		}
 	}
 
-	checkRestic()
+	checkDeps()
 
 	if len(os.Args) < 2 {
 		p := tea.NewProgram(newTUI(), tea.WithAltScreen())
@@ -51,6 +52,8 @@ func main() {
 	case "rm":
 		requireArg(2, "snapshot rm <path>")
 		cmdRm(os.Args[2])
+	case "auto":
+		cmdAuto(arg(2), arg(3))
 	default:
 		printUsage()
 		os.Exit(1)
@@ -58,7 +61,8 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Print(`snapshot - workspace backup tool powered by restic
+	fmt.Print(`snapshot - automatic workspace backups with a beautiful tui
+https://github.com/sunneydev/snapshot
 
 usage:
   snapshot              interactive TUI
@@ -69,6 +73,7 @@ usage:
   snapshot ws           list workspaces
   snapshot add <path>   register workspace
   snapshot rm <path>    unregister workspace
+  snapshot auto [on|off] [interval]  manage automatic backups
 
 flags:
   --help, -h     show this help
@@ -76,9 +81,11 @@ flags:
 `)
 }
 
-func checkRestic() {
+func checkDeps() {
 	if _, err := exec.LookPath("restic"); err != nil {
-		fmt.Fprintln(os.Stderr, "restic not found. install: brew install restic (macOS) or https://restic.net")
+		fmt.Fprintln(os.Stderr, "missing dependency. run:")
+		fmt.Fprintln(os.Stderr, "  brew install restic    (macOS)")
+		fmt.Fprintln(os.Stderr, "  apt install restic     (linux)")
 		os.Exit(1)
 	}
 }
@@ -187,6 +194,44 @@ func cmdAdd(path string) {
 		}
 	}
 	fmt.Println(successStyle.Render("added: " + shortenHome(abs)))
+
+	if !isAutoEnabled() {
+		fmt.Println()
+		fmt.Print("  set up automatic backups? [10m/30m/1h/6h/skip] ")
+		var choice string
+		fmt.Scanln(&choice)
+		choice = strings.TrimSpace(strings.ToLower(choice))
+		if choice != "" && choice != "skip" && choice != "s" && choice != "n" && choice != "no" {
+			if err := enableAuto(choice); err != nil {
+				fmt.Fprintln(os.Stderr, dimStyle.Render("  failed to set up automatic backups: "+err.Error()))
+				return
+			}
+			fmt.Println(successStyle.Render("  automatic backups enabled (every " + choice + ")"))
+		}
+	}
+}
+
+func cmdAuto(action, interval string) {
+	switch action {
+	case "":
+		fmt.Println("  automatic backups: " + autoStatus())
+	case "on":
+		if interval == "" {
+			interval = "30m"
+		}
+		if err := enableAuto(interval); err != nil {
+			fatal(err.Error())
+		}
+		fmt.Println(successStyle.Render("automatic backups enabled (every " + interval + ")"))
+	case "off":
+		if err := disableAuto(); err != nil {
+			fatal(err.Error())
+		}
+		fmt.Println(successStyle.Render("automatic backups disabled"))
+	default:
+		fmt.Fprintln(os.Stderr, "usage: snapshot auto [on|off] [10m|30m|1h|6h]")
+		os.Exit(1)
+	}
 }
 
 func cmdRm(path string) {
