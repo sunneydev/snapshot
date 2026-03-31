@@ -16,18 +16,14 @@ snapshot runs in the background, silently creating incremental backups of your w
 ## install
 
 ```sh
-npm i -g snapvault
+curl -fsSL https://raw.githubusercontent.com/sunneydev/snapshot/main/install.sh | bash
 ```
+
+or with homebrew:
 
 ```sh
 brew install sunneydev/tap/snapshot
 ```
-
-```sh
-go install github.com/sunneydev/snapshot@latest
-```
-
-or grab a binary from [releases](https://github.com/sunneydev/snapshot/releases).
 
 ## get started
 
@@ -99,10 +95,6 @@ backup repos are stored in `~/.local/share/snapshot/repos/`.
 ## claude code integration
 
 snapshot works as a `/snapshot` skill in [claude code](https://claude.ai/claude-code), so you can save and restore snapshots before risky operations without leaving your terminal.
-
-## requirements
-
-restic is bundled automatically when installing via npm or homebrew. if you installed via `go install`, you'll need [restic](https://restic.net) on your PATH (`brew install restic` or `apt install restic`).
 
 ## license
 

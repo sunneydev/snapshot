@@ -39,7 +39,9 @@ brews:
       name: homebrew-tap
     name: snapshot
     homepage: https://github.com/sunneydev/snapshot
-    description: automatic workspace backups with a beautiful tui
+    description: protect your workspaces from destructive ai agents with automatic periodic backups
     license: MIT
+    dependencies:
+      - name: restic
     install: |
       bin.install "snapshot"
