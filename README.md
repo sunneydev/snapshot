@@ -1,11 +1,22 @@
 # snapshot
 
-automatic workspace backups with a beautiful tui.
+your filesystem's safety net. automatic periodic backups that protect your workspaces from destructive ai agents, bad refactors, and accidental `rm -rf` moments.
+
+## why
+
+ai coding agents (cursor, claude code, copilot, etc.) can rewrite, delete, or corrupt files faster than you can review them. one wrong tool call and your afternoon is gone.
+
+snapshot runs in the background, silently creating incremental backups of your workspaces every few minutes. when something goes wrong, you roll back in seconds.
+
+- **automatic** - set it once, backups run on a schedule (every 10m, 30m, 1h, or 6h)
+- **incremental** - only changes are stored, so backups are fast and tiny
+- **encrypted** - every backup repo is encrypted at rest
+- **beautiful tui** - browse, restore, and diff snapshots interactively
 
 ## install
 
 ```sh
-npm i -g snapshot-backup
+npm i -g snapvault
 ```
 
 ```sh
@@ -16,9 +27,15 @@ brew install sunneydev/tap/snapshot
 go install github.com/sunneydev/snapshot@latest
 ```
 
-or download a binary from [releases](https://github.com/sunneydev/snapshot/releases).
+or grab a binary from [releases](https://github.com/sunneydev/snapshot/releases).
 
-## demo
+## get started
+
+```sh
+snapshot add ~/work
+```
+
+that's it. you'll be prompted to enable automatic backups right away. pick an interval and forget about it.
 
 ```
   snapshot
@@ -33,70 +50,59 @@ or download a binary from [releases](https://github.com/sunneydev/snapshot/relea
   ↑/↓ navigate · enter select · q quit
 ```
 
-## quick start
+## automatic backups
+
+the whole point. once enabled, snapshot creates backups on a schedule using launchd (macos) or cron (linux).
 
 ```sh
-snapshot add ~/work     # register a workspace
-snapshot save           # create your first snapshot
-snapshot                # open the tui
+snapshot auto on 30m    # every 30 minutes
+snapshot auto           # check status
+snapshot auto off       # disable
 ```
+
+intervals: `10m`, `30m`, `1h`, `6h`
+
+you can also enable this when adding a workspace with `snapshot add`.
 
 ## commands
 
-| command | description |
+| command | what it does |
 |---------|-------------|
-| `snapshot` | open the interactive tui |
-| `snapshot save [path]` | create a snapshot of a workspace |
-| `snapshot list [path]` | list snapshots for a workspace |
-| `snapshot restore <path> [id]` | restore a file from a snapshot |
-| `snapshot diff <path>` | diff a file against the latest snapshot |
+| `snapshot` | open the tui |
+| `snapshot save [workspace]` | create a snapshot now |
+| `snapshot list [workspace]` | list snapshots |
+| `snapshot restore <path> [id]` | restore a file |
+| `snapshot diff <path>` | diff a file against the last snapshot |
 | `snapshot add <path>` | register a workspace |
 | `snapshot rm <path>` | unregister a workspace |
-| `snapshot ws` | list registered workspaces |
+| `snapshot ws` | list workspaces |
+| `snapshot auto [on\|off] [interval]` | manage automatic backups |
 
 ## how it works
 
-each workspace gets its own backup repository with automatic deduplication and encryption. large files (>20M), build artifacts, node_modules, .git, and other common junk are excluded by default.
+each workspace gets its own encrypted backup repository with automatic deduplication. backups are incremental so only changes since the last snapshot are stored.
 
-backups are incremental - only changes since the last snapshot are stored, so they're fast and space-efficient.
+large files (>20MB), build artifacts, node_modules, .git, and other common noise are excluded by default.
 
 ## configuration
 
-all config lives in `~/.config/snapshot/` (or `$XDG_CONFIG_HOME/snapshot/`).
+config lives in `~/.config/snapshot/` (or `$XDG_CONFIG_HOME/snapshot/`).
 
 | file | purpose |
 |------|---------|
-| `workspaces` | registered workspace paths, one per line |
-| `password` | repository encryption password |
+| `workspaces` | registered workspace paths |
+| `password` | encryption password |
+| `schedule` | auto-backup interval |
 
-data (repos) is stored in `~/.local/share/snapshot/repos/` (or `$XDG_DATA_HOME/snapshot/repos/`).
-
-### default excludes
-
-node_modules, .git, dist, build, .next, .turbo, .gradle, .venv, __pycache__, .cache, coverage, and more. files larger than 20M are skipped.
-
-## automatic backups
-
-snapshot can set up automatic backups for you (launchd on macOS, cron on linux).
-
-```sh
-snapshot auto on 30m
-```
-
-you'll also be asked during `snapshot add` if you want to enable this. options: `10m`, `30m`, `1h`, `6h`.
-
-```sh
-snapshot auto          # check status
-snapshot auto off      # disable
-```
+backup repos are stored in `~/.local/share/snapshot/repos/`.
 
 ## claude code integration
 
-snapshot works as a `/snapshot` skill in [claude code](https://claude.ai/claude-code). use it to save and restore snapshots before risky operations.
+snapshot works as a `/snapshot` skill in [claude code](https://claude.ai/claude-code), so you can save and restore snapshots before risky operations without leaving your terminal.
 
 ## requirements
 
-- [restic](https://restic.net) - installed automatically with homebrew, or `apt install restic` on linux
+restic is bundled automatically when installing via npm or homebrew. if you installed via `go install`, you'll need [restic](https://restic.net) on your PATH (`brew install restic` or `apt install restic`).
 
 ## license
 

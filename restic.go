@@ -48,9 +48,19 @@ var defaultExcludes = func() []string {
 	return base
 }()
 
+var resticBin = func() string {
+	if exe, err := os.Executable(); err == nil {
+		local := filepath.Join(filepath.Dir(exe), "restic")
+		if _, err := os.Stat(local); err == nil {
+			return local
+		}
+	}
+	return "restic"
+}()
+
 func resticCmd(repo string, args ...string) *exec.Cmd {
 	full := append([]string{"--repo", repo, "--password-file", passFile}, args...)
-	return exec.Command("restic", full...)
+	return exec.Command(resticBin, full...)
 }
 
 func resticBackup(ws string) (string, error) {
@@ -107,5 +117,5 @@ func resticDump(ws, path string) (string, error) {
 }
 
 func resticInit(repo string) error {
-	return exec.Command("restic", "init", "--repo", repo, "--password-file", passFile).Run()
+	return exec.Command(resticBin, "init", "--repo", repo, "--password-file", passFile).Run()
 }

@@ -82,6 +82,9 @@ flags:
 }
 
 func checkDeps() {
+	if _, err := os.Stat(resticBin); err == nil {
+		return
+	}
 	if _, err := exec.LookPath("restic"); err != nil {
 		fmt.Fprintln(os.Stderr, "missing dependency. run:")
 		fmt.Fprintln(os.Stderr, "  brew install restic    (macOS)")

@@ -1,7 +1,7 @@
 {
-  "name": "snapshot-backup",
+  "name": "snapvault",
   "version": "0.0.0",
-  "description": "automatic workspace backups with a beautiful tui",
+  "description": "protect your workspaces from destructive ai agents and accidental changes with automatic periodic backups",
   "license": "MIT",
   "repository": {
     "type": "git",
